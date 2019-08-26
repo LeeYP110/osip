@@ -1,0 +1,21 @@
+﻿  fsm_misc.c
+  ict.c
+  ict_fsm.c
+  ist.c
+  ist_fsm.c
+  nict.c
+  nict_fsm.c
+  nist.c
+  nist_fsm.c
+  osip.c
+  osip_dialog.c
+  osip_event.c
+  osip_time.c
+  osip_transaction.c
+  port_condv.c
+e:\code\third-party\osip\src\osip2\port_condv.c(205): warning C4244: '=': conversion from 'const time_t' to 'int', possible loss of data
+  port_fifo.c
+  port_sema.c
+  port_thread.c
+  Generating Code...
+  osip2.vcxproj -> E:\Code\third-party\exosip\platform\vsnet\v141\x64\Debug\osip2.lib
