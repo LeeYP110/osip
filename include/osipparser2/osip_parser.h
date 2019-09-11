@@ -758,6 +758,13 @@ extern "C" {
  * @param sip The element to work on.
  * @param value the value of the new header.
  */
+
+#define osip_message_set_event(sip,value)	 osip_message_set_header((osip_message_t *)sip,(const char *)"Event",value)
+#define osip_message_get_event(sip,pos,dest) osip_message_header_get_byname(( osip_message_t *)sip,(const char *)"event",pos,(osip_header_t **)dest)
+
+#define osip_message_set_Subscription_State(sip,value)	 osip_message_set_header((osip_message_t *)sip,(const char *)"Subscription-State",value)
+#define osip_message_get_Subscription_State(sip,pos,dest) osip_message_header_get_byname(( osip_message_t *)sip,(const char *)"subscription-state",pos,(osip_header_t **)dest)
+
 #define osip_message_set_expires(sip,value)         osip_message_set_header((osip_message_t *)sip,(const char *)"Expires",value)
 /**
  * Find a Expires header.
