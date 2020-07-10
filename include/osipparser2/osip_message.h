@@ -113,14 +113,14 @@ extern "C" {
 /**
  * You can re-define your own maximum length for SIP message.
  */
-#define SIP_MESSAGE_MAX_LENGTH 8000
+#define SIP_MESSAGE_MAX_LENGTH 16000
 #endif
 
 #ifndef BODY_MESSAGE_MAX_SIZE
 /**
  * You can define the maximum length for a body inside a SIP message.
  */
-#define BODY_MESSAGE_MAX_SIZE  4000
+#define BODY_MESSAGE_MAX_SIZE  16000
 #endif
 
 /**
