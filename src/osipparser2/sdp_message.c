@@ -1632,7 +1632,7 @@ sdp_message_parse (sdp_message_t * sdp, const char *buf) {
     while (more_m_header == 1) {
       more_m_header = sdp_message_parse_m (sdp, ptr, &next_buf);
       if (more_m_header == -1)  /* header is bad */
-        return -1;
+        break; // fix 2020.7.14 liyueping
       ptr = next_buf;
       if (*ptr == '\0' || (*ptr == '\r') || (*ptr == '\n'))
         return OSIP_SUCCESS;
