@@ -1,14 +1,14 @@
 AC_PREREQ([2.69])
-AC_INIT([libeXosip2],[5.1.1])
-AC_CONFIG_SRCDIR([include/eXosip2/eXosip.h])
+AC_INIT([libosip2],[5.1.1])
+AC_CONFIG_SRCDIR([include/osip2/osip.h])
 
-AC_MSG_NOTICE([libeXosip2              The Extended Open SIP library.])
-AC_MSG_NOTICE([Copyright (C) 2002-2020 Aymeric MOIZARD - <amoizard@antisip.com>])
+AC_MSG_NOTICE([libosip2                The GNU Open SIP library.])
+AC_MSG_NOTICE([Copyright (C) 2001-2020 Aymeric MOIZARD - <amoizard@antisip.com>])
 
-AC_SUBST(LIBEXOSIP_SO_VERSION, 12:1:1)
-AC_SUBST(EXOSIP_VERSION, $VERSION)
+AC_SUBST(LIBOSIP_SO_VERSION, 12:0:1)
+AC_SUBST(OSIP_VERSION, $VERSION)
 
-AC_MSG_RESULT([Configuring ${PACKAGE} ${EXOSIP_VERSION}])
+AC_MSG_RESULT([Configuring ${PACKAGE} ${VERSION}])
 OS=`uname|sed -e 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/'`
 AC_MSG_RESULT([Building Package on ${OS}])
 
@@ -16,12 +16,12 @@ AC_MSG_RESULT([Building Package on ${OS}])
 dnl *********************************************************************
 dnl Initialize automake stuff
 AC_CONFIG_AUX_DIR(scripts)
-AC_CONFIG_HEADERS(exosip-config.h)
+AC_CONFIG_HEADERS(osip-config.h)
 AM_INIT_AUTOMAKE
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])],)
 AC_CONFIG_MACRO_DIR([scripts])
 
-AC_CANONICAL_HOST
+AC_CANONICAL_HOST                                                               
 
 dnl Checks for programs.
 
@@ -29,11 +29,10 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
 
+
 dnl Initialize libtool
 AC_PROG_SED
 LT_INIT
-
-
 
 dnl declare --enable-* args and collect ac_help strings
 
@@ -55,7 +54,7 @@ AC_ARG_ENABLE(trace,
 dnl minimize size of code.
 AC_ARG_ENABLE(minisize,
   [AS_HELP_STRING([--enable-minisize],
-    [only compile minimal voip related code @<:@default=no@:>@])],
+    [only compile minimal voip related code @<:@default=no@:>@])], 
   enable_minisize=$enableval,enable_minisize="no")
 
 dnl support for linux-thread or posix thread (pthread.h)
@@ -71,10 +70,17 @@ AC_ARG_ENABLE(semaphore,
     [select your prefered semaphore @<:@default=autodetect@:>@.])],
   enable_semaphore=$enableval,enable_semaphore="autodetect")
 
-AC_ARG_ENABLE(openssl,
-  [AS_HELP_STRING([--enable-openssl],
-    [enable support for openssl @<:@default=yes@:>@])],
-  enable_openssl=$enableval,enable_openssl="yes")
+dnl support for gperf.
+AC_ARG_ENABLE(gperf,
+  [AS_HELP_STRING([--enable-gperf],
+    [enable support for gperf (improve the parser speed) @<:@default=no@:>@])],
+  enable_gperf=$enableval,enable_gperf="no")
+
+dnl libdict support.
+AC_ARG_ENABLE(hashtable,
+  [AS_HELP_STRING([--enable-hashtable],
+    [compile with hashtable (libdict) support @<:@default=no@:>@])],
+  enable_hashtable=$enableval,enable_hashtable="no")
 
 dnl build with multithreaded support (need semaphore).
 AC_ARG_ENABLE(mt,
@@ -82,15 +88,11 @@ AC_ARG_ENABLE(mt,
     [compile with multi-thread support @<:@default=yes@:>@])],
   enable_mt=$enableval,enable_mt="yes")
 
-AC_ARG_ENABLE(srvrec,
-  [AS_HELP_STRING([--enable-srvrec],
-    [enable support for SRV records DNS queries @<:@default=yes@:>@])],
-  enable_srvrec=$enableval,enable_srvrec="yes")
-
-AC_ARG_ENABLE(tools,
-  [AS_HELP_STRING([--enable-tools],
-    [compile tools programs @<:@default=yes@:>@])],
-  enable_tools=$enableval,enable_tools="yes")
+dnl support for test suite.
+AC_ARG_ENABLE(test,
+  [AS_HELP_STRING([--enable-test],
+    [enable building test programs @<:@default=no@:>@])],
+  enable_test=$enableval,enable_test="no")
 
 dnl compile with mt support
 if test "x$enable_mt" = "xyes"; then
@@ -103,8 +105,16 @@ if test "x$enable_mt" = "xyes"; then
     CC="$PTHREAD_CC"
   fi
 else
-    EXOSIP_FLAGS="$EXOSIP_FLAGS -DOSIP_MONOTHREAD"
+  SIP_FSM_FLAGS="-DOSIP_MONOTHREAD"
 fi
+
+AM_CONDITIONAL(BUILD_MT, test x$enable_mt = xyes)
+
+if test "x$enable_gperf" = "xyes"; then
+  SIP_PARSER_FLAGS="$SIP_PARSER_FLAGS -DUSE_GPERF"
+fi
+
+AM_CONDITIONAL(COMPILE_TESTS, test "x$enable_test" != "xno")
 
 if test "x$enable_semaphore" = "xsemaphore"; then
   AC_DEFINE(HAVE_SEMAPHORE_H)
@@ -117,75 +127,67 @@ fi
 
 if test "x$host_cpu" = "x$build_cpu"; then
   case $OS in
+   linux*)
+     SIP_EXTRA_FLAGS="$SIP_EXTRA_FLAGS"
+     ;;
+   irix*)
+     ;;
+   hpux* | hp-ux*)
+     ;;
+   aix*)
+     ;;
    osf*)
-     AC_CHECK_LIB(rt,sem_open,[EXOSIP_LIB="$EXOSIP_LIB -lrt"])
+     ;;
+   sunos*)
+     ;;
+   darwin*)
      ;;
    *)
      ;;
  esac
+else
+ AC_MSG_NOTICE([Cross compiling osip.])
 fi
 
-case $OS in
-  *mingw*)
-    EXOSIP_FLAGS="$EXOSIP_FLAGS  -D_WIN32_WINNT=0x0501"
-    EXOSIP_LIB="EXOSIP_LIB -lws2_32 -liphlpapi -ldnsapi"
-    dnl tools are not ported to win32
-    enable_tools=no
+case $host_cpu in
+  arc*)
     ;;
   *)
     ;;
 esac
 
+if test "x$enable_hashtable" = "xyes"; then
+   AC_CHECK_HEADERS([dict/dict.h],
+                   [AC_DEFINE([HAVE_DICT_DICT_H], [], [Define to 1 if you have <dict/dict.h> header file])],
+                   [AC_MSG_ERROR([libdict library not installed. Please install or use --disable-hashtable])])
+   EXTRA_LIB="$EXTRA_LIB -ldict"
+fi
+
 if test "x$enable_trace" = "xyes"; then
-  EXOSIP_FLAGS="$EXOSIP_FLAGS -DENABLE_TRACE"
+  SIP_EXTRA_FLAGS="$SIP_EXTRA_FLAGS -DENABLE_TRACE"
 fi
 
 if test "x$enable_mpatrol" = "xyes"; then
-  EXOSIP_FLAGS="$EXOSIP_FLAGS -DENABLE_MPATROL"
-  EXOSIP_LIB="$EXOSIP_LIB -lmpatrolmt -lelf"
+  SIP_EXTRA_FLAGS="$SIP_EXTRA_FLAGS -DENABLE_MPATROL"
+  EXTRA_LIB="$EXTRA_LIB -lmpatrolmt -lelf -lpthread"
 fi
 
 if test "x$enable_gprof" = "xyes"; then
-  EXOSIP_FLAGS="$EXOSIP_FLAGS -pg"
+  SIP_EXTRA_FLAGS="$SIP_EXTRA_FLAGS -pg"
+  EXTRA_LIB="$EXTRA_LIB -lc_p"
 fi
 
 if test "x$enable_minisize" = "xyes"; then
-  EXOSIP_FLAGS="$EXOSIP_FLAGS -DMINISIZE"
+  SIP_EXTRA_FLAGS="$SIP_EXTRA_FLAGS -DMINISIZE"
 fi
-
 AM_CONDITIONAL(BUILD_MAXSIZE, test x$enable_minisize = xno)
-AM_CONDITIONAL(COMPILE_TOOLS, test "x$enable_tools" = "xyes")
 
-dnl Checks for libraries.
-AC_CHECK_LIB(posix4,sem_open,[EXOSIP_LIB="$EXOSIP_LIB -lposix4 -mt"])
-AC_CHECK_LIB(nsl,nis_add,[EXOSIP_LIB="$EXOSIP_LIB -lnsl"])
-AC_CHECK_LIB(socket,sendto,[EXOSIP_LIB="$EXOSIP_LIB -lsocket"])
-AC_CHECK_LIB(rt,clock_gettime,[EXOSIP_LIB="$EXOSIP_LIB -lrt"])
-
-case $OS in
-  openbsd*)
-     ;;
-  *)
-     AC_CHECK_LIB(resolv,res_query,[EXOSIP_LIB="$EXOSIP_LIB -lresolv"])
-     AC_CHECK_LIB(resolv,__res_query,[EXOSIP_LIB="$EXOSIP_LIB -lresolv"])
-     ;;
-esac
-
-AC_CHECK_LIB([cares], [ares_init],
-     [AC_CHECK_HEADERS(ares.h,
-	[EXOSIP_LIB="$EXOSIP_LIB -lcares"],
-	[AC_MSG_WARN([c-ares header files are not installed])])
-     ],
-     [AC_MSG_WARN([c-ares library is not installed])]
-)
-
-PKG_CHECK_MODULES(OSIP, libosip2 >= 5.0, [], [
-AC_MSG_WARN([assuming osip can be found in -I$includedir and -L$libdir])
-OSIP_CFLAGS='-I$(includedir) -I$(prefix)/include'
-OSIP_LIBS='-L$(libdir) -L$(prefix)/lib -losip2 -losipparser2'
-])
-
-EXOSIP_FLAGS="$EXOSIP_FLAGS"
+dnl Checks for libraries. (those one are needed for sun)
+AC_CHECK_LIB(posix4,sem_open,[FSM_LIB="$FSM_LIB -lposix4 -mt"])
+AC_CHECK_LIB(nsl,nis_add,[FSM_LIB="$FSM_LIB -lnsl"])
+AC_CHECK_LIB(socket,sendto,[FSM_LIB="$FSM_LIB -lsocket"])
+AC_CHECK_LIB(c, lrand48, AC_DEFINE([HAVE_LRAND48], [], [Defined if you have lrand48]))
+AC_CHECK_LIB(rt,clock_gettime,[FSM_LIB="$FSM_LIB -lrt"])
 
 AC_CACHE_CHECK([whether -Wall works], Wall_cv_flag, [
   saved_CPPFLAGS=$CPPFLAGS
@@ -286,88 +288,74 @@ if test "x$Wpointer_arith_cv_flag" = xyes; then
   CPPFLAGS="$CPPFLAGS -Wpointer-arith"
 fi
 
-AC_SUBST(EXOSIP_FLAGS)
-AC_SUBST(EXOSIP_LIB)
+dnl SIP_CFLAGS="$SIP_CFLAGS $CFLAGS"
+
+AC_SUBST(SIP_CFLAGS)
+
+AC_SUBST(SIP_EXTRA_FLAGS)
+AC_SUBST(SIP_PARSER_FLAGS)
+AC_SUBST(SIP_FSM_FLAGS)
+
+AC_SUBST(EXTRA_LIB)
+AC_SUBST(PARSER_LIB)
+AC_SUBST(FSM_LIB)
 
 dnl Checks for header files.
+
+dnl This is to be removed for autoconf2.50
 AC_HEADER_STDC
-AC_CHECK_HEADERS(memory.h)
-AC_CHECK_HEADERS(ctype.h)
 AC_CHECK_HEADERS(string.h)
 AC_CHECK_HEADERS(strings.h)
-AC_CHECK_HEADERS(stdio.h)
 AC_CHECK_HEADERS(stdlib.h)
-AC_CHECK_HEADERS(limits.h)
 AC_CHECK_HEADERS(unistd.h)
+AC_CHECK_HEADERS(sys/types.h)
+dnl !This is to be removed for autoconf2.50
+
+AC_CHECK_HEADERS(sys/unistd.h)
+AC_CHECK_HEADERS(syslog.h)
+AC_CHECK_HEADERS(ctype.h)
+AC_CHECK_HEADERS(stdio.h)
 AC_CHECK_HEADERS(stdarg.h)
 AC_CHECK_HEADERS(varargs.h)
+AC_CHECK_HEADERS(fcntl.h)
+AC_CHECK_HEADERS(time.h)
 AC_CHECK_HEADERS(sys/time.h)
+AC_CHECK_HEADERS(sys/select.h)
 AC_CHECK_HEADERS(assert.h)
 AC_CHECK_HEADERS(signal.h)
 AC_CHECK_HEADERS(sys/signal.h)
 AC_CHECK_HEADERS(malloc.h)
-AC_CHECK_HEADERS(sys/select.h)
-AC_CHECK_HEADERS(sys/types.h)
-AC_CHECK_HEADERS(sys/socket.h)
-AC_CHECK_HEADERS(sys/ioctl.h)
-AC_CHECK_HEADERS(sys/param.h)
-AC_CHECK_HEADERS(fcntl.h)
-AC_CHECK_HEADERS(sys/soundcard.h)
-AC_CHECK_HEADERS(arpa/inet.h)
-AC_CHECK_HEADERS(arpa/nameser.h)
-AC_CHECK_HEADERS(netdb.h)
-AC_CHECK_HEADERS(nameser8_compat.h)
-AC_CHECK_HEADERS(arpa/nameser_compat.h)
-AC_CHECK_HEADERS(netinet/tcp.h)
-AC_CHECK_HEADERS(netinet/in.h)
-AC_CHECK_HEADERS(regex.h)
-AC_CHECK_HEADERS(sys/epoll.h)
 
-AC_CHECK_HEADERS([resolv.h], [], [],
-[#if HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#endif
-#if HAVE_NETINET_IN_H
-#include <netinet/in.h>
-#endif
-#if HAVE_ARPA_NAMESER_H
-#include <arpa/nameser.h>
-#endif
+AC_CHECK_TYPES([struct timeval],,,[
+     #if TIME_WITH_SYS_TIME
+     # include <sys/time.h>
+     # include <time.h>
+     #else
+     # if HAVE_SYS_TIME_H
+     #  include <sys/time.h>
+     # else
+     #  include <time.h>
+     # endif
+     #endif
 ])
 
-dnl check if we have the getifaddrs() sytem call
-AC_CHECK_FUNCS(getifaddrs)
-AC_CHECK_FUNCS(gmtime_r)
-AC_CHECK_FUNCS(gmtime)
-
-AS_IF([test "$enable_openssl" = "yes" -o "$enable_openssl" = "auto"],
-      [PKG_CHECK_MODULES([SSL], [openssl],
-                         [EXOSIP_LIB="$EXOSIP_LIB $SSL_LIBS"]
-                         AC_CHECK_HEADERS(openssl/ssl.h),
-                         [AS_IF([test "$enable_openssl" = "yes"],
-                                [AC_MSG_WARN([can not find openssl with pkgconfig])
-				AC_CHECK_HEADERS(openssl/ssl.h)
-				AC_CHECK_LIB(ssl,SSL_CTX_new,[EXOSIP_LIB="$EXOSIP_LIB -lssl"])
-				AC_CHECK_LIB(crypto,MD5,[EXOSIP_LIB="$EXOSIP_LIB -lcrypto"])
-				])
-                         ])
-      ])
-
-if test "x$enable_srvrec" = "xyes" ; then
-  AC_DEFINE([SRV_RECORD], [1], [Defined to 1 if compiled with NAPTR and SRV support.])
-fi
-
-AC_CONFIG_FILES([Makefile
- scripts/Makefile
- platform/Makefile
- platform/vsnet/Makefile
- include/Makefile
- include/eXosip2/Makefile
- src/Makefile
- tools/Makefile 
- help/Makefile
- help/doxygen/Makefile
- help/doxygen/doxygen.dox
-])
+AC_CONFIG_FILES([libosip2.pc
+Makefile
+scripts/Makefile
+src/Makefile
+src/osipparser2/Makefile
+src/osip2/Makefile
+src/test/Makefile
+include/Makefile
+include/osip2/Makefile
+include/osipparser2/Makefile
+include/osipparser2/headers/Makefile
+help/Makefile
+help/man/Makefile
+help/doxygen/Makefile
+platform/Makefile
+platform/rpm/Makefile
+platform/vsnet/Makefile
+include/osip2/doxygen.dox])
 AC_OUTPUT
 

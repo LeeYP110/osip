@@ -100,8 +100,8 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
 mkinstalldirs = $(SHELL) $(top_srcdir)/scripts/mkinstalldirs
-CONFIG_HEADER = $(top_builddir)/exosip-config.h
-CONFIG_CLEAN_FILES = doxygen.dox
+CONFIG_HEADER = $(top_builddir)/osip-config.h
+CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -123,7 +123,7 @@ am__can_run_installinfo = \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
-am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/doxygen.dox.in \
+am__DIST_COMMON = $(srcdir)/Makefile.in \
 	$(top_srcdir)/scripts/mkinstalldirs
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
@@ -150,10 +150,9 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
-EXOSIP_FLAGS = @EXOSIP_FLAGS@
-EXOSIP_LIB = @EXOSIP_LIB@
-EXOSIP_VERSION = @EXOSIP_VERSION@
+EXTRA_LIB = @EXTRA_LIB@
 FGREP = @FGREP@
+FSM_LIB = @FSM_LIB@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -162,8 +161,8 @@ INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
-LIBEXOSIP_SO_VERSION = @LIBEXOSIP_SO_VERSION@
 LIBOBJS = @LIBOBJS@
+LIBOSIP_SO_VERSION = @LIBOSIP_SO_VERSION@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
@@ -177,8 +176,7 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OSIP_CFLAGS = @OSIP_CFLAGS@
-OSIP_LIBS = @OSIP_LIBS@
+OSIP_VERSION = @OSIP_VERSION@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -188,10 +186,8 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
+PARSER_LIB = @PARSER_LIB@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-PKG_CONFIG = @PKG_CONFIG@
-PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
-PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 PTHREAD_CC = @PTHREAD_CC@
 PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
@@ -199,8 +195,10 @@ RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
-SSL_CFLAGS = @SSL_CFLAGS@
-SSL_LIBS = @SSL_LIBS@
+SIP_CFLAGS = @SIP_CFLAGS@
+SIP_EXTRA_FLAGS = @SIP_EXTRA_FLAGS@
+SIP_FSM_FLAGS = @SIP_FSM_FLAGS@
+SIP_PARSER_FLAGS = @SIP_PARSER_FLAGS@
 STRIP = @STRIP@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
@@ -257,10 +255,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-EXTRA_DIST = DoxyFile doxygen.dox.in \
-ht0-initialize.dox \
-ht1-callcontrol.dox \
-ht2-registration.dox
+EXTRA_DIST = DoxyFile \
+ht0-initialize.dox     ht1-uri.dox     \
+ht2-parser.dox         ht3-fsm.dox     \
+ht4-dialog.dox         ht5-portability.dox
 
 all: all-am
 
@@ -294,8 +292,6 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-doxygen.dox: $(top_builddir)/config.status $(srcdir)/doxygen.dox.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -459,7 +455,8 @@ uninstall-am:
 .PRECIOUS: Makefile
 
 
-all: doxygen.dox
+doxygen:
+	doxygen DoxyFile
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

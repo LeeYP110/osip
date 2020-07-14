@@ -1,352 +1,402 @@
-eXosip2 (5.1.0) - 2020-01-16
-	* new API:
-	Generate random string: (low entropy, only hexa)
-	int eXosip_hexa_generate_random(char *val, int val_size);
-	Generate random string: (high entropy when compiled with openssl)
-	int eXosip_byte_generate_random(char *val, int val_size)
+libosip2 (5.1.1) - 2020-01-16
+	* fix vulnerability report: Authentication-Info or Proxy-Authentication-Info are affected by a buffer overflow when building sip messages.
+	* fix vulnerability report: when boundary only contains one quote, strncpy will use the unsigned value of -1 as size parameter.
+	* fix: avoid several memory leaks detected in the SDP parser upon invalid SDP formats.
+	* fix bug #57467: infinite loop in sdp_message_a_attribute_del_at_index
+	* fix bug #56071: Heap-buffer-overflow in osip_util_replace_all_lws function in osip_message_parse.c
+	* fix to reject any non compliant answer with missing version digits.
 
-	* provide more entropy with eXosip_byte_generate_random (with openssl when available).
-	* fix TLS security issue reported by Alexander Traud regarding hostname validation when using NAPTR/SRV.
-	* add support for epoll (detected by configured) // becomes the default on linux platforms with autotools
-	* fix bug #56839: The cnonce should not be static -this is identified as replay attack by some services-.
-	* fix tcp and tls connection failure detection (accelerate error detection and recovery)
-	* fix: fixed a crash with DTLS
+libosip2 (5.1.0) - 2019-03-27
+	* STRUCTURE change: struct osip_srv_record
+	* STRUCTURE change: struct osip_naptr
+	* constant renamed: CRLF, LF, CR, SP renamed to OSIP_CRLF, OSIP_LF, OSIP_CR, OSIP_SP
 
-eXosip2 (5.1.0) - 2019-03-27
-	* minor API update:
-	  API parameter change: eXosip_call_build_ack/eXosip_call_send_ack API to use tid instead of did as parameter.
+	* new API: int parser_add_comma_separated_header(const char *hname);
 
-	* new API: add an API to insert one extra header in BYE:
-	  int eXosip_call_terminate_with_header(struct eXosip_t *excontext, int cid, int did, const char *header_name, const char *header_value);
-	  void eXosip_dnsutils_release(struct osip_naptr *naptr_record); required after usage of eXosip_dnsutils_naptr.
+	* support larger binary attachment.
+	* use strspn for better readability.
+	* update osip_naptr & osip_srv_record structures to hold more NAPTR info and store ENUM result.
+	* add AM_SILENT_RULES for autotools silent compilation.
+	* fix a bug introduced in version 5: The current code is not counting correctly escaped " for multiple
+	  headers on one line. This is fixed.
+	* In order to prevent incorrect parsing of header that should not appear on one line, osip now contains
+	  a list of known headers which are allowed to appear as "multiple header on one line separated with COMMA".
+	  Other headers will be parsed as ONE header.
+	* new API: parser_add_comma_separated_header API can be used to add other headers in the list, so they
+	  will be parsed by osip as "multiple header on one line".
+	* support for Visual Studio 2017: rename macro, better usage of WINAPI_FAMILY.
+	* add some pre-defined SIP answer code (from www.iana.org/assignments/sip-parameters/)
+	* fix windows compilation on mingw/msys if compiling without threads.
+	* fix bug report: sr #109265: SIP message body length underflow in libosip2-4.1.0
+	  https://savannah.gnu.org/support/?109265
+	* other minor changes: warning, compilation...
 
-	* new OPTION:
-	EXOSIP_OPT_SET_SESSIONTIMERS_FORCE option to force session timer to be used when remote side does not support it.
+libosip2 (5.0.0)
+	* STRUCTURE change: additionnal parameter for "struct osip_srv_entry" used for failover in eXosip2.
 
-	* structure change:
-	new param in eXosip_tls_credentials_t for pinning: "public_key_pinned". A file with the expected public key of server.
-	If you use eXosip_tls_ctx_t/eXosip_tls_credentials_t/EXOSIP_OPT_SET_TLS_CERTIFICATES_INFO, you need to recompile.
+	* fix overflow: sr #109133: Heap buffer overflow in utility function *osip_clrncpy*
+	* fix overflow: sr #109132: Heap buffer overflow in *osip_body_to_str*
+	* fix overflow: sr #109131: Heap buffer overflow in `_osip_message_to_str`
+	* simplify usage of timercmp/timerisset/timerclear
+	* optimize list search: use iterator
+	* improve/update autotools (./configure and options, Makefile.am, ax_thread.m4...)
+	* verify a URI scheme only contains allowed char
+	* improve make check (test unit) to make it clear about the results expected.
+	* fix a possible buffer overflow of 1 byte in sdp_message_to_str (size=sdp allocated size)
+	* fix cseq check in order to stop retransmission of 200ok
+	* update to reject negative value in port number
+	* add support for ntlm authentication in parser
+	* include application_data when cloning sip message
+	* fix to allow correct parsing of quoted string in from/to/contact/...
+	* add authorizations and proxy_authorizations into ACK for 3xx, 4xx, 5xx, and 6xx (if answer was not 401/407)
+	* additionnal check for cseq number for matching incoming ack restransmission
+	* patch to transmit ack for OSIP_ICT_ACK_SENT event
+	* improve management of body length // fix a bug when initial value of body is \0.
+	* increase timer E as soon as we receive 1xx for NICT.
+	* update all reasons according to RFC.
+	* add some reason code from rfc4412, rfc3261 and rfc6086.
+	* parse addr spec with LAQUOT and RAQUOT in generic parameters.
+	* avoid issue with comma in userinfo of URI which may appear for several headers such as Contact.
+	* do not use multiple header method for t, f, i, r, refer-to, b, referred-by headers.
+	* allow faster connection with non blocking reliable sockets.
+	* improve android time compensation.
 
-	* fix processing response out of transaction. (avoid incorrect logs and extra work)
-	* fix https://savannah.nongnu.org/bugs/?54628 where ACK was only retransmitted for initial outgoing INVITE.
-	  fix: retransmit ACK for both initial INVITE and re-INVITE.
-	  fix: retransmit ACK for 2xx from forking (with a BYE) even if call does not exist.
-	  ACK for "old transaction" within the established dialog won't be retransmitted because the parameter only hold the latest ACK.
-	* fix bug report: https://savannah.nongnu.org/bugs/index.php?54624
-	  another patch to fix more issue related to cseq & PRACK.
-	  The newer code better handle forking use-case with PRACK.
-	  The newer code better handle several 1xx from same user.
-	* fix bug report: https://savannah.nongnu.org/bugs/index.php?54624 cseq wasn't increasing after a PRACK.
-	* improve portability code, detection of headers, windows compilation detection, sockaddr_storage was not correctly defined.
-	* fix udp layer: set ipbuf before using it.
-	* fix: allow socket descriptor to be 0 (posix requirement).
-	* fix: compile with any openssl version.
-	* allow compilation with OPENSSL_NO_DH, OPENSSL_NO_RSA, OPENSSL_NO_ECDH and/or OPENSSL_NO_DEPRECATED.
-	* remove old windows specific RSA obsolete code.
-	* add in eXtl_tls.c some explanations on usage of TLS with eXosip2. READ THEM.
-	* improve reliability for naptr/srv lookup (but still a short time).
-	* fix/improve _eXosip_mark_registration_expired: it was working correctly only if registration had previously failed.
-	* fix: attach call/dialog to CANCEL transaction (so EXOSIP_CALL_MESSAGE_ANSWERED will be received instead of EXOSIP_MESSAGE_ANSWERED).
-	* windows: fix DnsQuery to use UTF8 even if compiled without UNICODE (not applicable if you use c-ares).
-	* windows: add ENUM capability and improve NAPTR/SRV record (not applicable if you use c-ares).
-	* windows: you should use c-ares AND you should compile with UNICODE. (much better).
-	* add ability to define a dnsserver when doing NAPTR and SRV record (c-ares only).
-	* format of domain string for "eXosip_dnsutils_naptr" is "domain.com!+AUS|IP_DNSSERVER".
-	* fix for on android, DNS are not available any more (restricted access) (c-ares only).
-	* add support ENUM and regex for res_query API (not applicable if you use c-ares).
-	* sync with newer osip: use newer osip_naptr & osip_srv_record structures to hold ENUM sip result and
-	  improvements to retreive (and release) it via eXosip_dnsutils_naptr and eXosip_dnsutils_release APIs.
-	* TLS improvments: simplify client and server config, add ECDH cipher suite if missing,
-	  password for private key is optional, add support for public key pinning.
-	* improve to report EXOSIP_CALL_NOANSWER upon transport error for INVITE for faster detection.
-	* fix possible memory leak for X509 server certificate.
-	* fix crash if dialog has been already closed between 200ok and a received BYE.
-	* improve windows pipe replacement (use a free allocated port automatically).
-	* fix to optimize detection of TCP or TLS establishement, fix to optimize sending REGISTER after establishement.
-	* patch for call transfer to keep dialog after BYE, in order to be able to handle incoming/outgoing NOTIFY within calls after BYE.
-	* handle incoming UPDATE from alternative dialogs in early dialog mode.
-	* fix to reject any NOTIFY without established dialog coming later than 64 seconds after initial SUBSCRIBE.
-	* After a NAPTR query, some DNS server returns SUCCESS without NAPTR answers. In such use-case, fallback to manual SRV records.
-	* add SOCK_CLOEXEC option to sockets // add missing SO_KEEPALIVE options on TLS socket.
-	* EXOSIP_OPT_ENABLE_IPV6 now support 0(ipv4 only), 1(ipv6 only) and 2(ipv4 OR ipv6).
-	  With option 2, choice is made based on DNS and the stack can fallback between IPv4 and IPv6.
-	* fix possible memory leak when using wrong tid for eXosip_insubscription_send_answer.
-	* fix possible memory leak upon allocation error.
-	* fix leak upon syntax error in parameters provided for PUBLISH.
-	* fix leak upon syntax error in parameters provided for REGISTER.
-	* increase size of proto_ifs for IPv6 local address.
-	* RFC 2617 erratum: Errata ID: 1649 (minor issue).
-	* _exosip_isipv4addr: fix checking IPv4 address (minor issue).
-	* other minor updates.
+libosip2 (4.1.0)
+	* fix sdp re-allocation
+	* increase max length size
+	* support for Visual Studio 2012 (v110 and v110 for XP)
+	* support for Windows Phone 8
+	* osip_trace_initialize returns 0 if log are compiled.
+	* timer e and timer g will use #define DEFAULT_T2 instead of 4000.
+	* handle additionnal possible malloc failure.
+	* fix compatibility with old UA for INVITE retransmission.
+	* fix osip_sem_destroy leak on apple.
+	* accept lowercase sip/2.0.
+	* increase max default size for logs on windows.
 
-eXosip2 (5.0.0)
-	* major API update: add a new parameter to eXosip_call_build_prack in order to create the PRACK
-	for this specific response and not for the latest.
-	* major API update: removal of eX_refer.h API. REFER are now handled with subscriptions APIs.
-	eXosip_refer_build_request removed
-	eXosip_refer_send_request removed
-	* major API update: subscription now handle both SUBSCRIBE and REFER with the same APIs:
-	eXosip_subscription_build_initial_refer ADDED
-	eXosip_subscribe_build_initial_request renamed eXosip_subscription_build_initial_subscribe
-	eXosip_subscribe_send_initial_request renamed eXosip_subscription_send_initial_request
-	eXosip_subscribe_build_refresh_request renamed eXosip_subscription_build_refresh_request
-	eXosip_subscribe_send_refresh_request renamed eXosip_subscription_send_refresh_request
-	eXosip_subscribe_remove renamed eXosip_subscription_remove
-	EXOSIP_IN_SUBSCRIPTION_* and EXOSIP_SUBSCRIPTION_* events may now relate to REFER subscription.
-	* major API change: eXosip_automatic_refresh is obsolete and has been removed.
-	only use eXosip_automatic_action instead
-	* API update:
-	eXosip_options_send_request returns a positive transaction id (tid) on success.
-	eXosip_publish returns a positive transaction id (tid) on success.
-	note: eXosip_message_send_request was already returing the transaction id (tid) on success.
-	* new API options:
-	EXOSIP_OPT_REMOVE_PREROUTESET: to keep Route Set
-	EXOSIP_OPT_SET_SIP_INSTANCE: define +sip.instance parameter in Contact headers
-	EXOSIP_OPT_ENABLE_USE_EPHEMERAL_PORT: option to use/not use ephemeral port in Contact.
-	EXOSIP_OPT_ENABLE_REUSE_TCP_PORT: option to reuse port.
-	EXOSIP_OPT_AUTO_MASQUERADE_CONTACT: option to enable automatic masquerading for Contact headers.
-	EXOSIP_OPT_UDP_LEARN_PORT: obsolete and will be removed in the future.
-	EXOSIP_OPT_SET_DEFAULT_CONTACT_DISPLAYNAME: define a display name to be added in Contact headers
-	* new API options: (high load traffic use-case: DO NOT USE FOR COMMON USAGE)
-	EXOSIP_OPT_SET_MAX_MESSAGE_TO_READ: set the number of message to read at once for each network processing.
-	EXOSIP_OPT_SET_MAX_READ_TIMEOUT: set the period in nano seconds during we read for sip message.
-	EXOSIP_OPT_GET_STATISTICS: retreive numerous statistics.
-	* rewrite/update autotools and ./configure options
-	  --enable-pthread=[autodetect|force]
-	    autodetect POSIX threads or force -DHAVE_PTHREAD [default=autodetect]
-	  --enable-semaphore=[autodetect|semaphore|sysv]
-	    select your prefered semaphore [default=autodetect].
-
-	* fix selection of Contact header for 3xx (default to a tel/sip/sips one with any transport)
-	* keep to call context enough time to handle redirection.
-	* fix race condition for processing SRV results (not likely to happen)
-	* fix bug when reading sip message longuer than 8000 over UDP and TLS.
-	* improve eXosip_add_authentication_info to avoid duplicate credentials
-	* if a SUBSCRIBE is rejected, the context will be released automatically
-	* add failover after a DNS failure.
-	* fallback to SRV even if we receive a NOTFOUND reply for NAPTR.
-	* fix route set with strict router.
-	* rename usage of -DHAVE_CARES_H into -DHAVE_ARES_H real name of header.
-	* remove warnings mainly related to socket API (getnameinfo/bind/accept/recv/connect/sendto)
-	* rewrite all loop using iterator to improve performance (useful for high load traffic)
-	* rewrite Via and Contact management: both will now contains the IP of the real network interface
-	  instead of the default one.
-	* improve NAPTR failover, more reliable // add failover for 503 answer
-	* improve interval to force REGISTER refresh upon network error and failover.
-	* improve TCP socket management
-	* add a callback to simplify/optimize/accelerate usage of wakelocks in android application using exosip2.
-	* improve TLS, add TLSv1.1, TLSv1.2, disable weak cipher (FREAK) and enable ECDHE cipher.
-	* add support for SNI tls extension (openssl 1.0.2)
-	* add try/except on windows to catch possible missing qwave (windows server)
-	* implement a timeout (32 seconds) for establishing a TCP and TLS connection.
-	* if a connection is failing, report the failure asap.
-	* fix memory leak in eXosip_call_get_referto
-	* remove extra connect on socket for TCP and TLS (not allowed for tcp stream)
-	* fix to correctly discard INVITE retransmission with same branch received after original INVITE was replied
-	* add WSACleanup for each WSAStartup call (windows)
-	* do not include contact in BYE and CANCEL
-	* fix to use sips when appropriate (in Contact)
-	* fix to avoid handling negative content-length
-	* do not start naptr for incoming transactions.
-	* fix bug when rseq is empty but exist
-	* add support for QOS on windows.
-	* improve connection handling/failure detection, keep alive options, in TLS, TCP, UDP.
-	* update static IDs (cid/did/rid/pid) to use range from 0 to INT_MAX to avoid possible collision
-	* other minor updates.
-
-eXosip2 (4.1.0)
-	* improve timer and use UPDATE if advertised, INVITE otherwise.
-	* improve PRACK support.
-	* option to disable automatic BYE answer.
-	* option to enable/disable IPv6 per eXosip_t instance.
-	* option to disable DNS cache.
-	* improve network support for several eXosip_t instance.
-	  keepalive setting is per instance.
-	  ipv4/ipv6 setting is per instance.
-	  improve network setting to avoid conflict upon transport change.
-	* fix tcp and tls connect() for slow connection.
-	* use TCP_NODELAY on more platform.
-	* use Authorization header for 401 // simplify authentication code.
-	* minor expires for REGISTER improvments.
-	* copy call-info over SUBSCRIBE refresh.
-	* allow more TLS error if verification is disabled.
-	* fix if NO NAPTR is availble.
-	* add support for Windows Phone 8.
-	* fix to use cache for TCP and TLS.
-	* fix possible leaks on implementation errors.
-	* add TSC experimental support.
-
-eXosip2 (4.0.0)
-	* modify configuration APIs to use eXosip_set_option
-	* fix bug: do not create new PRACK if it already exist for an answer.
-	* update to latest osip // test time compensation for android.
-	* use ephemaral port in standard TCP and TLS version.
-	* return tid number so that we can match the response event.
+libosip2 (4.0.0)
+	* implement time compensation for android.
+	* reduce path len // remove path in front of logs.
+	* accept only SIP/D.D format message.
+	* fix bug when releasing request with missing major headers.
+	* fix minor memory leak // remove limitation on fifo size.
+	* add system time support for macosx and ios.
 	* use system independant time for osip_gettimeofday on unix platform.
-	* major API update: several "struct eXosip_t" can be
-	  handled at the same time. This can be used to have several
-	  transport layer running at the same time.
-	* many tiny other change.
+	* To compile/use osip based application in multi threaded
+	  env, you don't need to define -DOSIP_MT any more. Instead,
+	  if you wish to disable the feature, you can compile with
+	  -DOSIP_MONOTHREAD.
+	* A few other clean up were made inside osip to avoid any
+	  define to appear in include files. Also to avoid conflict,
+	  config.h has been renamed to osip-config.h.
 
-eXosip2 (3.6.0)
-	* use optionnal c-ares DNS library for non blocking DNS access
-	  as well as improvments over DNS operation such as NAPTR and
-	  SRV records.
-	* again, so many minor change/fix/improvments, sorry for not
-	  being able to have an history here... The git on savannah
-	  will bring you all details!
+libosip2 (3.6.0)
+	* minor improvments. The git on savannah will bring you all details!
 
-eXosip2 (3.5.0)
+libosip2 (3.5.0)
 	* iphone with TCP/TLS background support.
 	* android support.
 	* a lot of minor change/fix/improvments, sorry for not being
 	  able to have an history here...
 
-eXosip2 (3.4.0)
-	* modification to allow using "windows certificate store" for TLS.
-	* handle keep alive for TCP/TLS.
-	* fix when receiving additionnal CRLF on reliable transport.
-	* modification to allow non-blocking socket for reliable transport. (TLS/TCP)
-	* fix tag issue with application where tag is missing.
-	* fix compilation for mingw
-	* fix Contact header in request within dialog for non-udp protocol.
-	* fix some DNS issue with vista?
-	* remove 481 auto answer for unsolicited NOTIFY.
-	* fix static id range.
-	* initial code for TCP fragmentation.
-	* osip_list prototypes and warnings fix
-	* fix transport matching for redirection using other transport than udp
+libosip2 (3.4.0)
+	* remove CRLF before parsing SIP message.
+	* modification to allow non-blocking socket for reliable transport.
+	* fix race condition for non-atomic incrementation operation.
+	* osip_list improvements.
+	* osip_list prototypes and warnings fix.
+	* new osip_strcasestr method.
 
-eXosip2 (3.3.0)
-	* Fix when 200ok include a contact with an empty line parameter.
-	* Fix for replaces header longuer than 256 char.
-	* Fix SRV record with more than 10 answers.
-	* Sort SRV record.
-	* Option to disable NAPTR requests.
+libosip2 (3.3.0)
+	* new APPLE native interface for semaphore
+	* add relative time in log information on linux/windows
+	* fix: unescape last uri parameters.
 
-eXosip2 (3.2.0)
-	* Improve TLS support and add an API for ssl information & files.
+libosip2 (3.2.0)
 	* return new error code for all API.
-	* remove automatic answers to PRACK. (must be done in application now)
-	* remove automatically outgoing non established susbscriptions.
 
-eXosip2 (3.1.0)
-	* AKA authentication.
-	* improve compliance & flexibility.
+libosip2 (3.1.0)
+	* Windows Mobile 5/6 improvments.
+	* allow uncompliant/IMS authentication headers.
+	* fix when a space appear as the first char in body.
+	* terminate body with '\0' after parsing (don't rely on this!)
 
-eXosip2 (3.0.4)
-	* fix building SUBSCRIBE refresh.
-	* fix compliance issue with refer-to to-tag/from-tag parameters.
-	* fix bug for retransmissions or ACK with proxy that resolve
-	  to several IP.
-	* handle the "expires" parameter to update registration interval.
-	* handle the "expires" parameter to update publication interval.
-	* handle automatically publish refresh, and some error codes (423).
+libosip2 (3.0.3)
+	* initial support for rtems.
 
-eXosip2 (3.0.3)
-	* Add TLS support.
-	* rewrite transport layer.
-	* add line= parameter in Contact headers for registrations.
-	* a few changes related to interop. issues.
-	* add missing *_REQUESTFAILURE events on no answer.
-	* Update registration interval when Expires header is in 200ok.
-
-eXosip2 (3.0.2)
-	* fix call transfer issue with "Replaces" header.
-	* allow build/run eXosip in non-threaded model (without -DOSIP_MT).
+libosip2 (3.0.2)
 	* initial support for ucos.
-	* add support for qop authentication.
-	* remove registration context immediatly upon eXosip_register_remove.
-	* TCP: fix missing Contact in INVITE sent.
-	* TCP: fix missing "transport" in Contact for answers within dialog.
-	* TCP: fix possible race conditions.
+	* fix to ignore broken optionnal header when parsing.
 
-eXosip2 (3.0.1)
+libosip2 (3.0.1)
 	* add Windows CE support with Visual Studio 2005
 	  (WM5.0,PocketPC 2003/2005, Smartphone)
-	* Update to osip2-3.0.1
-	* Add SRV record capabilities.
-	* add new OPTIONS: do not send 101, remove pre-route set from message.
+	* Fix memory leaks (not likely to happen).
+	* Fix buffer overrun in url.
+	* Modification of the Application Binary Interface (ABI)
+	  to decrease number of allocations.
+	  Changes: osip_message_t/osip_dialog_t/sdp_message_t/osip_fifo_t
+	* save route headers in the same order (CALLER or CALLER) in dialogs.
 
-eXosip2 (2.2.3)
-	* announce NOTIFY answers to application.
-	* fix authentication bugs from previous patch.
-	* fix TCP bug
-	* fix using code 699
+libosip2 (2.2.3)
+	* fix 64-bit (amd64) issue with hash.
+	* remove SDP negotiation (much better to do it in your applications)
 
-eXosip2 (2.2.2)
-	* new version synchronized with osip2
-	* total rewrite of eXosip.
-	*   -> new API for more flexibility
-	*   ->   media negotiation must now be handled outside of eXosip2
+libosip2 (2.2.2)
+	* parser speed improvements
+	* replace mutex with critical section on windows for performance.
+	* fix a bug in the parser for empty header (also store empty Accept header)
+	* improve mime support.
+	* improve sipfrag support.
+	* add NULL checks (uris...).
+	* patch for PSOS support.
 
-eXosip (0.9.1)
-	* add publish support through a nice API.
+libosip2 (2.2.1)
+	* fix a potential mem leak content_type and osip_message_parse.
+	* fix osip_body_clone method (add terminating NULL)
+	* fix for binary support when multipart is used.
+	* automatic check for reliable protocol SCTP and TLS.
+	* avoid <winsock.h> inclusion so user can (and must) now include either
+	  <winsock.h> or <winsock2.h> before including <osip/osip2.h>
 
-eXosip (0.9.0)
-	* improve presence support (busy, away, onthephone...).
-	* new eXosip_automatic_refresh() to refresh SUBSCRIBE and REGISTER.
-	* Fix dialog establishement when receiving NOTIFYs.
-	* This ChangeLog has not been updated seriously... Many changes
-	* have been done but they don't appear here. Sorry.
-	* status of libexosip:
-	*   call transfer : OK
-	*   redirection of calls (3XX) : OK
-	*   SUB/NOTIFY for presence : nearly OK (usable)
-	*   authenthication (REGISTER and INVITE only) : ok
+libosip2 (2.2.0)
+	* remove #ifdef OSIP_RETRANSMIT_2XX to always compile it.
+	* initialize remote_contact_uri when dialog is built with notify.
+	* allow very short attachements.
+	* new macros allocators.
+	* remove use of alloca in the parser.
+	* fix memory bug when realloc is needed on large message.
+	* remove useless prototypes.
+	* fix memory access in parser.
+	* API slightly broken to enable support for binary data.
+	* improvements of the sip message test suite.
 
-eXosip (0.8.0)
-	* fix processing of 180 Ringing?
-	* fix bug when BYE is processed before a 2xx for INVITE.
+libosip2 (2.0.9)
+	* fix detection of CRLFCRLF in osip_util_replace_all_lws.
+	* fix expires header with comma.
+	* fix a few memory leak in parser.
+	* improvements for the new sdp negociator.
+	* fix trace mode.
 
-eXosip (0.7.7)
-	* memory leaks.
-	* tiny bugs, code clean-up.
+libosip2 (2.0.8)
+	* Fix lookup of generic/uri parameter (use case-insensitive comparison)
+	* Initial release of the new SDP negociator. (old one will be removed)
+	* fix bug in parser (windows)
+	* fix lookup of generic_paramter and uri_parameter.
+	* fix memory leak in condition variable (windows).
 
-eXosip (0.7.6)
-	* fix bug when 1st proxy is using strict routing.
-	* support for IPv4 and IPv6.
-	* do not send 180 Ringing any more on new INVITEs.
-	* close correctly rtp streams in josua.
-	* improve the eXosip_event_wait method.
-	* performance updated on win32 for event handling.
+libosip2 (2.0.7)
+	* Fix a parser bug for uncomplete request line.
+	* Update timer facility for windows.
+	* Remove useless #define.
 
-eXosip (0.7.5)
-	* small improvements for josua.
-	* patch for IPv6 (uncomplete)
-	* patch for authentication
+libosip2 (2.0.6)
+	* Fix a memory access in authentication headers.
+	* Fix possible buffer overflow in uri.
+	* Two memory bug fix in the parser.
+	* allow missing tag in To header of incoming request.
+	* reindentation of all code.
 	* improve configure.in file
-	* allow fancy reason phrase in SIP answer.
-	* allow to NAT traversal (firewall IP in SDP packet).
+	* tiny other fix (doxygen, prototypes, warnings)
 
-eXosip (0.7.3)
-	* warning fix.
-	* support for multiple registrations.
-	* support for authentifications for REGISTER.
+libosip2 (2.0.5)
+	* Fix for content-type header.
+	* New optionnal timer interface. (will become the default)
+	* fix the sent-by check for matching response with transaction.
 
-eXosip (0.7.2)
-	* add RTP support with common ucl library.
-	* fix some memory leak.
-	* improve facility to change the local_sdp_port.
-	* add an event when ACK for 2xx is received.
+libosip2 (2.0.4)
+	* fix random number generation on windows.
+	* fix for MingGw compiler
+	* set paramter of sdp_negociation_t structure to NULL on init.
 
-eXosip (0.7.1)
-	* rewrite of header files and new directory architecture.
-	* support for INFO and OPTIONS within calls.
-	* support for AUDIO.
+libosip2 (2.0.3)
+	* new method to create dialog from NOTIFY requests.
+	* fix random number generation to avoid possible guess of random numbers.
+	* fix a bug for media line with number_of_port specified
+	* fix compile issue with --disable-trace & --disable-debug
 
-eXosip (0.6.3)
-	* use of event oriented interface in josua.
+libosip2 (2.0.2)
+	* fix Makefile.am to include debian directory.
+	* fix a bug when response contains a code set to "0".
+	* fix a bug when Mime-version is present but Content-type is undefined.
+	* fix when Call-Id is missing.
 
-eXosip (0.6.2)
-	* New Event oriented interface with applications.
-	* support for both MSN or compliant UAs.
-	* SUBSCRIBE/NOTIFY for SIMPLE support.
-	* script for adding/updating subscribers. (eXosip_addsubscriber.sh)
+libosip2 (2.0.1)
+	* fix bug in osip_message_to_str() for too long messages.
+	* improve robustness when parsing empty headers.
+	* add optionnal retransmission of 2xx and ACK for INVITE capabilities.
+	* fix bug on exit for WIN32.
 
-eXosip (0.6.1)
-	* INVITE, CANCEL, BYE, REGISTER, MESSAGE, REFER
-	* script for adding/updating contact. (eXosip_addfreind.sh)
-	* script for adding/updating identity. (eXosip_addidentity.sh)
-	* NCURSES interface.
-	* options for current session.
+libosip2 (2.0.0)
+	* initial release of libosip2
+
+libosip2 (1.99.6)
+        * complete new organization of files and directories.
+        * become libosip2.
+
+libosip (1.99.4)
+        * fix a bug when ACK for 3456xx can't be built.
+        * complete reorganisation of includes, files and directories.
+        * moving free to corresponding *_free()
+        * remove the need to define HAVE_* to compile simple program with osip2
+        * complete renaming of the API.
+
+libosip (0.9.7)
+	* fix a bug in hdr_wwwauthenticate.c.
+	* patch for debian packaging and version management.
+	* extra free removed for pSOS (smutex_destroy/ssem_destroy)
+	* fix crash when osip can't build ACK for 3456xx to INVITEs.
+	* Extra spaces now appear before content-length digits.
+
+libosip (0.9.6)
+	* fix transaction_init for request without mandatory headers.
+	* refuse to create transactions with cseq and method that differs.
+	* check minimum authorized length for method name of request.
+	* fix the state when a retransmission of INVITE is received.
+	* Minor changes in #define definitions just for clarity.
+
+libosip (0.9.5)
+	* fix a memory leak for retransmissions in msg_2char.
+	* fix a bug when startline end with CRCRLF.
+
+libosip (0.9.4)
+	* fix win32 compilation for Debug release.
+	* re-fix(?) the parsing of the Date header.
+	* verify log strings are NULL terminated.
+	* add syslog support.
+	* continue WINCE port.
+
+libosip (0.9.3)
+	* fix a bug for quoted strings starting with an escaped char '\'.
+	* initial commit for WinCE support. (uncomplete)
+	* fsm/port_sema.c: (windows only) sem_trywait was never returning 0.
+	* add a method to get possible destination and port for a request.
+
+libosip (0.9.2)
+	* add support for the received and rport parameters inside the osip stack.
+	* sdp_negoc.c: fix the video support.
+	* msg_parser.c: use realloc for main buffer of msg_parse().
+	* hdr_authorization.c: improve end of header detection.
+	* hdr_callinfo.c: fix a bug when realloc happen here.
+	* hdr_from.c: accept empty parameter.
+
+libosip (0.9.1)
+	* fix non multi-threaded version. (fifo_size was broken)
+	* Add win32 system logger feature. (compile with SYSTEM_LOGGER_ENABLED)
+
+libosip (0.9.0)
+	* a few warnings fix for win32.
+	* Change *_2char methods so they use realloc. (not yet finished!)
+	* Update the API and sip_t to support multiple "Authorization" headers.
+	* bug fixed in sclrspace() when allocated string is of length 1.
+	* bug fix ("sip:" and "sips:" should be equivalent to "SIP:" and "SIPS:")
+	* remove a printf.
+	* remove DEBUG() macros
+	* move TRACE -> OSIP_TRACE
+	* move trace -> osip_trace   to avoid duplicate definitions
+
+libosip (0.8.9)
+	* smsg.h: fix max_forward to max_forwards.
+	* osip/osip.h: you can now attach an application pointer to osip_t
+	* osip/dialog.h: fix prototype for hp-ux compiler.
+	* fsm/transaction.c: add transaction_free2(). A usefull method to
+	  free a transaction without removing it from the osip stack. (To
+	  be used when it has been already removed earlier.)
+
+libosip (0.8.8)
+	* windows: The windows contributions was wrong. Thread were killed
+	  instead of joined. I changed that...
+	* transaction.c/ict.c/ist.c/nict.c/nist.c: Avoid a race conditions
+	  when a retransmission might be added before the initial message
+	  is added in the fifo. (very unlikely to happen...)
+	* urls.c: built-in support of escaped sequences in sip-uri!
+	* vxworks minor patches.
+	* nict.c and ict.c: fix a bug with the setting of the port.
+	* fsm/dialog.c: if 1xx answer does not contain the route set, update
+	  it when the 200 OK comes in.
+	* parser/hdr_acceptencoding.c: msg_2char use realloc() now.
+	  (Thanks to chenshx for his patch)
+	* improve support of other scheme in the fsm. It is now able
+          to manage transaction with non-sipurl in the To or From header!
+	* urls.h: fix MACROs for adding parameters.
+	* new optional algo using gperf (thanks to <chenshx@mail.datang.com>)
+	  use ./configure --enable-gperf
+	* new debugging tools with mpatrol: ./configure --enable-mpatrol
+
+libosip (0.8.7)
+	* reject message with 2 call-id, 2cseq, 2 from, 2 to...
+	* allow generic_param can have a NULL value!.
+	* ist and nist was calling the wrong callback on retransmission.
+	* New checking rules compliant to the latest draft for internal
+	  management of transactions.
+	* "make check" is available and improve results ouput.
+	* delete warnings for OpenBSD compilation. The port to pth is still
+	  an issue for me.
+
+libosip (0.8.6)
+	* documentation started with Doxygen.
+
+libosip (0.8.5)
+	* Dialog fully tested and hoped to be correct.
+	* osip_create_transaction: can now be used to create ICT and NICT
+	* contact_param_add: fix MACRO! an argument was missing.
+	* dialog.c: make it more compliant: TO BE TESTED!
+	* transaction.c: MAJOR CHANGE: transaction_free() must now be called by the
+	  application! This way, you can re-use data before releasing the context..
+	* add a failure case when there is no '>' char when '<' is found.
+	* fix compilations issue with --disable-mt.
+
+libosip (0.8.4)
+	* ist_fsm.c: start timer i while entering CONFIRMED state.
+	* urls.c: bug in line 210.
+	* msg_cparser.c: switch CONTACT_SHORT & CONTENT_LENGTH_SHORT in table.
+	* osip_distribute_event(): obsolete!
+	  this method was previously used ONLY for incoming message.
+	  This was not clear! Now, you must use osip_find_transaction()
+	  and osip_create_transaction() instead.
+	* msg_write.c: add msg_clone()
+	* smsg.h: fix MACROS
+
+libosip (0.8.3)
+	* add lock/unlock methods for searching in transactions
+	* improve reliability when a NULL pointer is given to *_free methods.
+	* many bugs fixes in fsm/*
+	* parser/hdr_via.c: support for ipv6. Previous version are not compliant.
+
+libosip (0.8.2)
+	* ipv6 support (need more testing.)  - Thanks to tomohide.
+	* support for any scheme in url. (Use with care with applications.)
+	* support for sysv semaphore.
+
+libosip (0.8.1) testing ;urgency=high
+	* new finite state machines for TRANSACTION LAYER compliant with
+	  the rfc2543bis-09.txt. This is a total rewrite. Those new
+	  fsm should be usable either by proxies and endpoints. The
+	  difference is in the UAC_UAC_core and Proxy_core. (Stateless
+	  proxy don't need any state machines!)
+	* some bug fixes and one memory leak in the parser.
+	* COMPATIBILITY WITH PREVIOUS RELEASE IS NOT KEPT!
+	* test in ./example and ./example_mt are deprecated and removed.
+
+libosip (0.8.0) testing ;urgency=high
+	* new SDP parser
+	* new SDP automtic negociation facility (for User Agent)
+
+libosip (0.7.9) testing ;urgency=low
+        * hdr_authorization.c/hdr_wwwauthenticate.c:
+          Interoperability issue with Vovida.
+        * hdr_via.c: add the via_appendtopvia(...) as required by users...
+        * Windows updates makefiles (VC6++, tested on NT4).
+        * gcc-3.0 updates and ANSI modifications:
+        * Thanks to marko for little improvments.
+
+libosip (0.7.8) testing ;urgency=high
+        * this version is full SIP compliant with some excetions. Ask
+          osip@atosc.org for current status.
+        * HNY :-)
+        * Thanks to contributors for patches:
+           Vytautas Vysniauskas
+           Rick Flott.
+
+libosip (?.?.?) testing ;urgency=low
+        * oSIP is the official name!!!
