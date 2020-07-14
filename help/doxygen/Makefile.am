@@ -1,9 +1,9 @@
 
-EXTRA_DIST = DoxyFile \
-ht0-initialize.dox     ht1-uri.dox     \
-ht2-parser.dox         ht3-fsm.dox     \
-ht4-dialog.dox         ht5-portability.dox
+EXTRA_DIST = DoxyFile doxygen.dox.in \
+ht0-initialize.dox \
+ht1-callcontrol.dox \
+ht2-registration.dox
 
-doxygen:
-	doxygen DoxyFile
+
+all: doxygen.dox
 

@@ -1,8 +1,6 @@
 
-SUBDIRS = man doxygen
+SUBDIRS = doxygen
 
 EXTRA_DIST = \
-INSTALL.bsd     INSTALL.linux  INSTALL.vxworks  \
-INSTALL.linuxe  INSTALL.unix   INSTALL.win32    \
-INSTALL.wince
+INSTALL.linux
 

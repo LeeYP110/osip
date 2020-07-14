@@ -1,66 +1,81 @@
-       Description:  {#mainpage}
-       ===========
+Project    : eXosip2 - the eXtended osip Library.
+Email      : amoizard@antisip.com
+License    : GPL OR Commercial -same version-
+Home Page  : http://savannah.gnu.org/projects/exosip
+Company    : Antisip at http://www.antisip.com
 
- The GNU oSIP library is an implementation of SIP - rfc3261.
+eXosip is a GPL library that  extend  the  capability  of
+the oSIP library. It aims  to  implement  a  simple  high
+layer API to control SIP (rfc3261) for sessions establishements
+and common extensions.
 
- Email      : amoizard@gmail.com
- License    : LGPL (http://www.gnu.org)
- Home Page  : http://www.gnu.org/software/osip/osip.html
- Download   : ftp://ftp.gnu.org/gnu/osip
+This eXtended library should  provide  an API for call management,
+messaging, presence features and everything you need with SIP.
 
-"The GNU oSIP library" is part of the "GNU project".
-You can check www.gnu.org for more information about
-being part of the "GNU project".
+It's flexible, interoperable, stable and portable!
 
-For information, look at:
-   INSTALL
-   HISTORY
-   FEATURES
+Other license:
+--------------
 
-       Links:
-       =====
+src/inet_ntop.c:
+/* Copyright (c) 1996 by Internet Software Consortium.
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
+ * ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
+ * CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+ * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+ * SOFTWARE.
+ */
 
-Latest version:       ftp://ftp.gnu.org/gnu/osip
-Home page:            http://www.gnu.org/software/osip/osip.html
-Online Documentation: http://www.gnu.org/software/osip/
+Features:
+--------
 
-       Supported Platforms:
-       ===================
+eXosip2 has support for:
+ * registrations. (REGISTER)
+ * call initiation and modification. (INVITE, re-INVITE)
+ * other methods within calls (INFO, OPTIONS, UPDATE)
+ * call transfer. (REFER)
+ * reliability for provisionnal response. (PRACK)
+ * sip event package. (SUBSCRIBE/NOTIFY)
+ * event state publication. (PUBLISH)
+ * instant messaging. (MESSAGE)
+ * ...
 
-The library is known to compile on various platform:
-  *  GNU/Linux
-  *  Windows 7/vista/... (Visual studio or cygwin)
-  *  MacOSX
-  *  iOS
-  *  Android
-  *  Windows Mobile
-  *  OpenBsd 3.1/3.2  // (FreeBSD&NetBSD should also work)
-  *  Solaris
-  *  HP-Unix.
-  *  VxWorks.
-  *  Other embedded systems with linux.
+eXosip2 does not contain:
+ * RTP.
+ * audio interface
+ * sdp negotiation.
+ * ...
+          This allow you to write any kind of SIP endpoint/gateway.
 
-For more informations about compilation, please look in
-the ./help directory.
+Installation procedure:
+-----------------------
 
-       Test Programs:
-       =============
+The program is known to run on linux, ios, android, windows, unix, macosx,
+windows mobile... might work on any system with libc!
 
-The library contains some built-in test for the parser. To quickly test
-the parser, type: (Note that some tests MUST fail!)
+You should install c-ares before for much better DNS management!
+   http://c-ares.haxx.se
 
-  $> make check
+   $> ./configure
+   $> make
+   $> sudo make install
 
-Watch out the ./src/test/CHECK file for more informations.
+Contact information:
+--------------------
 
-       Contact Informations:
-       ====================
+For more information on eXosip, any contributions, or any remarks,
+you can contact me at <amoizard@antisip.com>.
 
-For more information on the SIP stack, or any contributions,
-you can contact the author at <amoizard@gmail.com>.
+Use the *osip* mailing list for question about eXosip.
+  <osip-dev@gnu.org>.
 
-A Mailing list is available for support: <osip-dev@gnu.org>.
-You can subscribe by writing to: <osip-dev-request@gnu.org>
-with a subject set to "subscribe".
-
-
+Subscribe by writing to:
+  <osip-dev-request@gnu.org> with a subject set to "subscribe".

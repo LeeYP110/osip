@@ -1,4 +1,16 @@
-/* osip-config.h.in.  Generated from configure.ac by autoheader.  */
+/* exosip-config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Define to 1 if you have the <ares.h> header file. */
+#undef HAVE_ARES_H
+
+/* Define to 1 if you have the <arpa/inet.h> header file. */
+#undef HAVE_ARPA_INET_H
+
+/* Define to 1 if you have the <arpa/nameser_compat.h> header file. */
+#undef HAVE_ARPA_NAMESER_COMPAT_H
+
+/* Define to 1 if you have the <arpa/nameser.h> header file. */
+#undef HAVE_ARPA_NAMESER_H
 
 /* Define to 1 if you have the <assert.h> header file. */
 #undef HAVE_ASSERT_H
@@ -6,20 +18,26 @@
 /* Define to 1 if you have the <ctype.h> header file. */
 #undef HAVE_CTYPE_H
 
-/* Define to 1 if you have <dict/dict.h> header file */
-#undef HAVE_DICT_DICT_H
-
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 
+/* Define to 1 if you have the `getifaddrs' function. */
+#undef HAVE_GETIFADDRS
+
+/* Define to 1 if you have the `gmtime' function. */
+#undef HAVE_GMTIME
+
+/* Define to 1 if you have the `gmtime_r' function. */
+#undef HAVE_GMTIME_R
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Defined if you have lrand48 */
-#undef HAVE_LRAND48
+/* Define to 1 if you have the <limits.h> header file. */
+#undef HAVE_LIMITS_H
 
 /* Define to 1 if you have the <malloc.h> header file. */
 #undef HAVE_MALLOC_H
@@ -27,11 +45,32 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
+/* Define to 1 if you have the <nameser8_compat.h> header file. */
+#undef HAVE_NAMESER8_COMPAT_H
+
+/* Define to 1 if you have the <netdb.h> header file. */
+#undef HAVE_NETDB_H
+
+/* Define to 1 if you have the <netinet/in.h> header file. */
+#undef HAVE_NETINET_IN_H
+
+/* Define to 1 if you have the <netinet/tcp.h> header file. */
+#undef HAVE_NETINET_TCP_H
+
+/* Define to 1 if you have the <openssl/ssl.h> header file. */
+#undef HAVE_OPENSSL_SSL_H
+
 /* Define if you have POSIX threads libraries and header files. */
 #undef HAVE_PTHREAD
 
 /* Have PTHREAD_PRIO_INHERIT. */
 #undef HAVE_PTHREAD_PRIO_INHERIT
+
+/* Define to 1 if you have the <regex.h> header file. */
+#undef HAVE_REGEX_H
+
+/* Define to 1 if you have the <resolv.h> header file. */
+#undef HAVE_RESOLV_H
 
 /* Define to 1 if you have the <semaphore.h> header file. */
 #undef HAVE_SEMAPHORE_H
@@ -57,11 +96,14 @@
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
 
-/* Define to 1 if the system has the type `struct timeval'. */
-#undef HAVE_STRUCT_TIMEVAL
+/* Define to 1 if you have the <sys/epoll.h> header file. */
+#undef HAVE_SYS_EPOLL_H
 
-/* Define to 1 if you have the <syslog.h> header file. */
-#undef HAVE_SYSLOG_H
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
+#undef HAVE_SYS_IOCTL_H
+
+/* Define to 1 if you have the <sys/param.h> header file. */
+#undef HAVE_SYS_PARAM_H
 
 /* Define to 1 if you have the <sys/select.h> header file. */
 #undef HAVE_SYS_SELECT_H
@@ -72,6 +114,12 @@
 /* Define to 1 if you have the <sys/signal.h> header file. */
 #undef HAVE_SYS_SIGNAL_H
 
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#undef HAVE_SYS_SOCKET_H
+
+/* Define to 1 if you have the <sys/soundcard.h> header file. */
+#undef HAVE_SYS_SOUNDCARD_H
+
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 
@@ -80,12 +128,6 @@
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
-
-/* Define to 1 if you have the <sys/unistd.h> header file. */
-#undef HAVE_SYS_UNISTD_H
-
-/* Define to 1 if you have the <time.h> header file. */
-#undef HAVE_TIME_H
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
@@ -120,6 +162,9 @@
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
 #undef PTHREAD_CREATE_JOINABLE
+
+/* Defined to 1 if compiled with NAPTR and SRV support. */
+#undef SRV_RECORD
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS

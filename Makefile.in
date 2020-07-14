@@ -13,7 +13,6 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
-
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -104,8 +103,8 @@ DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/scripts/mkinstalldirs
-CONFIG_HEADER = osip-config.h
-CONFIG_CLEAN_FILES = libosip2.pc
+CONFIG_HEADER = exosip-config.h
+CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -134,35 +133,6 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
-am__install_max = 40
-am__nobase_strip_setup = \
-  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
-am__nobase_strip = \
-  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
-am__nobase_list = $(am__nobase_strip_setup); \
-  for p in $$list; do echo "$$p $$p"; done | \
-  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
-  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
-    if (++n[$$2] == $(am__install_max)) \
-      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
-    END { for (dir in files) print dir, files[dir] }'
-am__base_list = \
-  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
-  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__uninstall_files_from_dir = { \
-  test -z "$$files" \
-    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
-    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
-         $(am__cd) "$$dir" && rm -f $$files; }; \
-  }
-am__installdirs = "$(DESTDIR)$(pkgconfigdir)"
-DATA = $(pkgconfig_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -172,7 +142,7 @@ am__recursive_targets = \
 AM_RECURSIVE_TARGETS = $(am__recursive_targets:-recursive=) TAGS CTAGS \
 	cscope distdir distdir-am dist dist-all distcheck
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) \
-	$(LISP)osip-config.h.in
+	$(LISP)exosip-config.h.in
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
 # *not* preserved.
@@ -193,14 +163,14 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
-am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/libosip2.pc.in \
-	$(srcdir)/osip-config.h.in $(top_srcdir)/scripts/compile \
+am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/exosip-config.h.in \
+	$(top_srcdir)/scripts/compile \
 	$(top_srcdir)/scripts/config.guess \
 	$(top_srcdir)/scripts/config.sub \
 	$(top_srcdir)/scripts/install-sh \
 	$(top_srcdir)/scripts/ltmain.sh $(top_srcdir)/scripts/missing \
 	$(top_srcdir)/scripts/mkinstalldirs AUTHORS COPYING ChangeLog \
-	INSTALL NEWS README TODO
+	INSTALL NEWS README
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -267,9 +237,10 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
-EXTRA_LIB = @EXTRA_LIB@
+EXOSIP_FLAGS = @EXOSIP_FLAGS@
+EXOSIP_LIB = @EXOSIP_LIB@
+EXOSIP_VERSION = @EXOSIP_VERSION@
 FGREP = @FGREP@
-FSM_LIB = @FSM_LIB@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -278,8 +249,8 @@ INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
+LIBEXOSIP_SO_VERSION = @LIBEXOSIP_SO_VERSION@
 LIBOBJS = @LIBOBJS@
-LIBOSIP_SO_VERSION = @LIBOSIP_SO_VERSION@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
@@ -293,7 +264,8 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OSIP_VERSION = @OSIP_VERSION@
+OSIP_CFLAGS = @OSIP_CFLAGS@
+OSIP_LIBS = @OSIP_LIBS@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -303,8 +275,10 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
-PARSER_LIB = @PARSER_LIB@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 PTHREAD_CC = @PTHREAD_CC@
 PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
@@ -312,10 +286,8 @@ RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
-SIP_CFLAGS = @SIP_CFLAGS@
-SIP_EXTRA_FLAGS = @SIP_EXTRA_FLAGS@
-SIP_FSM_FLAGS = @SIP_FSM_FLAGS@
-SIP_PARSER_FLAGS = @SIP_PARSER_FLAGS@
+SSL_CFLAGS = @SSL_CFLAGS@
+SSL_LIBS = @SSL_LIBS@
 STRIP = @STRIP@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
@@ -373,11 +345,9 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I scripts
-EXTRA_DIST = README BUGS FEATURES HISTORY autogen.sh libosip2.pc.in
-SUBDIRS = include src scripts help platform
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libosip2.pc
-all: osip-config.h
+EXTRA_DIST = README autogen.sh LICENSE.OpenSSL
+SUBDIRS = scripts platform src include tools help
+all: exosip-config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
@@ -415,22 +385,20 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
 
-osip-config.h: stamp-h1
+exosip-config.h: stamp-h1
 	@test -f $@ || rm -f stamp-h1
 	@test -f $@ || $(MAKE) $(AM_MAKEFLAGS) stamp-h1
 
-stamp-h1: $(srcdir)/osip-config.h.in $(top_builddir)/config.status
+stamp-h1: $(srcdir)/exosip-config.h.in $(top_builddir)/config.status
 	@rm -f stamp-h1
-	cd $(top_builddir) && $(SHELL) ./config.status osip-config.h
-$(srcdir)/osip-config.h.in:  $(am__configure_deps) 
+	cd $(top_builddir) && $(SHELL) ./config.status exosip-config.h
+$(srcdir)/exosip-config.h.in:  $(am__configure_deps) 
 	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
 	rm -f stamp-h1
 	touch $@
 
 distclean-hdr:
-	-rm -f osip-config.h stamp-h1
-libosip2.pc: $(top_builddir)/config.status $(srcdir)/libosip2.pc.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
+	-rm -f exosip-config.h stamp-h1
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -440,27 +408,6 @@ clean-libtool:
 
 distclean-libtool:
 	-rm -f libtool config.lt
-install-pkgconfigDATA: $(pkgconfig_DATA)
-	@$(NORMAL_INSTALL)
-	@list='$(pkgconfig_DATA)'; test -n "$(pkgconfigdir)" || list=; \
-	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(pkgconfigdir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(pkgconfigdir)" || exit 1; \
-	fi; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; \
-	done | $(am__base_list) | \
-	while read files; do \
-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pkgconfigdir)'"; \
-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pkgconfigdir)" || exit $$?; \
-	done
-
-uninstall-pkgconfigDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(pkgconfig_DATA)'; test -n "$(pkgconfigdir)" || list=; \
-	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(pkgconfigdir)'; $(am__uninstall_files_from_dir)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -761,12 +708,9 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(DATA) osip-config.h
+all-am: Makefile exosip-config.h
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(pkgconfigdir)"; do \
-	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
-	done
 install: install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
@@ -819,7 +763,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-pkgconfigDATA
+install-data-am:
 
 install-dvi: install-dvi-recursive
 
@@ -865,7 +809,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-pkgconfigDATA
+uninstall-am:
 
 .MAKE: $(am__recursive_targets) all install-am install-strip
 
@@ -879,38 +823,32 @@ uninstall-am: uninstall-pkgconfigDATA
 	info-am install install-am install-data install-data-am \
 	install-dvi install-dvi-am install-exec install-exec-am \
 	install-html install-html-am install-info install-info-am \
-	install-man install-pdf install-pdf-am install-pkgconfigDATA \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
+	install-man install-pdf install-pdf-am install-ps \
+	install-ps-am install-strip installcheck installcheck-am \
+	installdirs installdirs-am maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-generic \
 	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-pkgconfigDATA
+	uninstall-am
 
 .PRECIOUS: Makefile
 
 
-rpm-package:
-	cd platform && $(MAKE) rpm-package
-
-upload: dist
-	@echo "######## Maintainer only ##########";
-	@echo "building files for upload in ftp://ftp-upload.gnu.org/incoming/ftp";
-	@echo "building: $(PACKAGE)-$(VERSION).tar.gz.sig";
-	gpg -b $(PACKAGE)-$(VERSION).tar.gz
-	echo "version: 1.1" > $(PACKAGE)-$(VERSION).tar.gz.directive
-	echo "directory: osip" >> $(PACKAGE)-$(VERSION).tar.gz.directive
-	echo "filename: $(PACKAGE)-$(VERSION).tar.gz" >> $(PACKAGE)-$(VERSION).tar.gz.directive
-	@echo "building: $(PACKAGE)-$(VERSION).tar.gz.directive.asc";
-	gpg --clearsign $(PACKAGE)-$(VERSION).tar.gz.directive
-
 doxygen:
 	doxygen help/doxygen/DoxyFile
 
+upload: dist
+	@echo "######## Maintainer only ##########";
+	@echo "building files for upload in ftp://savannah.gnu.org/incoming/savannah/exosip";
+	@echo "building: $(PACKAGE)-$(VERSION).tar.gz.sig";
+	gpg -b $(PACKAGE)-$(VERSION).tar.gz
+
 indent:
-	indent */*/*.c
 	indent */*/*.h
-	rm -rf */*/*.c~
+	indent */*.h
+	indent */*.c
 	rm -rf */*/*.h~
+	rm -rf */*.h~
+	rm -rf */*.c~
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
