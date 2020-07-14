@@ -1,17 +1,17 @@
 /*
   The oSIP library implements the Session Initiation Protocol (SIP -rfc3261-)
   Copyright (C) 2001-2020 Aymeric MOIZARD amoizard@antisip.com
-  
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
   version 2.1 of the License, or (at your option) any later version.
-  
+
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
-  
+
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -46,13 +46,13 @@ extern "C" {
  * Structure for SIP Message (REQUEST and RESPONSE).
  * @var osip_message_t
  */
-  typedef struct osip_message osip_message_t;
+typedef struct osip_message osip_message_t;
 
 /**
  * Structure for SIP Message (REQUEST and RESPONSE).
  * @struct osip_message
  */
-  struct osip_message {
+struct osip_message {
     char *sip_version;                            /**< SIP version (SIP request only) */
     osip_uri_t *req_uri;                          /**< Request-Uri (SIP request only) */
     char *sip_method;                             /**< METHOD (SIP request only) */
@@ -107,46 +107,46 @@ extern "C" {
     size_t message_length;                        /**< internal value */
 
     void *application_data;                       /**< can be used by upper layer*/
-  };
+};
 
 #ifndef SIP_MESSAGE_MAX_LENGTH
 /**
  * You can re-define your own maximum length for SIP message.
  */
-#define SIP_MESSAGE_MAX_LENGTH 8000
+#define SIP_MESSAGE_MAX_LENGTH 16000
 #endif
 
 #ifndef BODY_MESSAGE_MAX_SIZE
 /**
  * You can define the maximum length for a body inside a SIP message.
  */
-#define BODY_MESSAGE_MAX_SIZE  4000
+#define BODY_MESSAGE_MAX_SIZE  16000
 #endif
 
 /**
  * Allocate a osip_message_t element.
  * @param sip The element to allocate.
  */
-  int osip_message_init (osip_message_t ** sip);
+int osip_message_init (osip_message_t ** sip);
 /**
  * Free all resource in a osip_message_t element.
  * @param sip The element to free.
  */
-  void osip_message_free (osip_message_t * sip);
+void osip_message_free (osip_message_t * sip);
 /**
  * Parse a osip_message_t element.
  * @param sip The resulting element.
  * @param buf The buffer to parse.
  * @param length The length of the buffer to parse.
  */
-  int osip_message_parse (osip_message_t * sip, const char *buf, size_t length);
+int osip_message_parse (osip_message_t * sip, const char *buf, size_t length);
 /**
  * Parse a message/sipfrag part and store it in an osip_message_t element.
  * @param sip The resulting element.
  * @param buf The buffer to parse.
  * @param length The length of the buffer to parse.
  */
-  int osip_message_parse_sipfrag (osip_message_t * sip, const char *buf, size_t length);
+int osip_message_parse_sipfrag (osip_message_t * sip, const char *buf, size_t length);
 /**
  * Get a string representation of a osip_message_t element.
  * NOTE: You need to release the sip buffer returned by this API when you
@@ -155,7 +155,7 @@ extern "C" {
  * @param dest new allocated buffer returned.
  * @param message_length The length of the returned buffer.
  */
-  int osip_message_to_str (osip_message_t * sip, char **dest, size_t * message_length);
+int osip_message_to_str (osip_message_t * sip, char **dest, size_t * message_length);
 /**
  * Get a string representation of a message/sipfrag part
  * stored in an osip_message_t element.
@@ -165,69 +165,69 @@ extern "C" {
  * @param dest new allocated buffer returned.
  * @param message_length The length of the returned buffer.
  */
-  int osip_message_to_str_sipfrag (osip_message_t * sip, char **dest, size_t * message_length);
+int osip_message_to_str_sipfrag (osip_message_t * sip, char **dest, size_t * message_length);
 /**
  * Clone a osip_message_t element.
  * @param sip The element to clone.
  * @param dest The new allocated element cloned.
  */
-  int osip_message_clone (const osip_message_t * sip, osip_message_t ** dest);
+int osip_message_clone (const osip_message_t * sip, osip_message_t ** dest);
 
 /**
  * Set the reason phrase. This is entirely free in SIP.
  * @param sip The element to work on.
  * @param reason The reason phrase.
  */
-  void osip_message_set_reason_phrase (osip_message_t * sip, char *reason);
+void osip_message_set_reason_phrase (osip_message_t * sip, char *reason);
 /**
  * Get the reason phrase. This is entirely free in SIP.
  * @param sip The element to work on.
  */
-  char *osip_message_get_reason_phrase (const osip_message_t * sip);
+char *osip_message_get_reason_phrase (const osip_message_t * sip);
 /**
  * Set the status code. This is entirely free in SIP.
  * @param sip The element to work on.
  * @param statuscode The status code.
  */
-  void osip_message_set_status_code (osip_message_t * sip, int statuscode);
+void osip_message_set_status_code (osip_message_t * sip, int statuscode);
 /**
  * Get the status code.
  * @param sip The element to work on.
  */
-  int osip_message_get_status_code (const osip_message_t * sip);
+int osip_message_get_status_code (const osip_message_t * sip);
 /**
  * Set the method. You can set any string here.
  * @param sip The element to work on.
  * @param method The method name.
  */
-  void osip_message_set_method (osip_message_t * sip, char *method);
+void osip_message_set_method (osip_message_t * sip, char *method);
 /**
  * Get the method name.
  * @param sip The element to work on.
  */
-  char *osip_message_get_method (const osip_message_t * sip);
+char *osip_message_get_method (const osip_message_t * sip);
 /**
  * Set the SIP version used. (default is "SIP/2.0")
  * @param sip The element to work on.
  * @param version The version of SIP.
  */
-  void osip_message_set_version (osip_message_t * sip, char *version);
+void osip_message_set_version (osip_message_t * sip, char *version);
 /**
  * Get the SIP version.
  * @param sip The element to work on.
  */
-  char *osip_message_get_version (const osip_message_t * sip);
+char *osip_message_get_version (const osip_message_t * sip);
 /**
  * Set the Request-URI.
  * @param sip The element to work on.
  * @param uri The uri to set.
  */
-  void osip_message_set_uri (osip_message_t * sip, osip_uri_t * uri);
+void osip_message_set_uri (osip_message_t * sip, osip_uri_t * uri);
 /**
  * Get the Request-URI.
  * @param sip The element to work on.
  */
-  osip_uri_t *osip_message_get_uri (const osip_message_t * sip);
+osip_uri_t *osip_message_get_uri (const osip_message_t * sip);
 
 
 /*
@@ -436,23 +436,23 @@ extern "C" {
  * @param generic_param The element to work on.
  * @param name the token name to set.
  */
-  void osip_generic_param_set_name (osip_generic_param_t * generic_param, char *name);
+void osip_generic_param_set_name (osip_generic_param_t * generic_param, char *name);
 /**
  * Get the name of a generic parameter element.
  * @param generic_param The element to work on.
  */
-  char *osip_generic_param_get_name (const osip_generic_param_t * generic_param);
+char *osip_generic_param_get_name (const osip_generic_param_t * generic_param);
 /**
  * Set the value of a generic parameter element.
  * @param generic_param The element to work on.
  * @param value the token name to set.
  */
-  void osip_generic_param_set_value (osip_generic_param_t * generic_param, char *value);
+void osip_generic_param_set_value (osip_generic_param_t * generic_param, char *value);
 /**
  * Get the value of a generic parameter element.
  * @param generic_param The element to work on.
  */
-  char *osip_generic_param_get_value (const osip_generic_param_t * generic_param);
+char *osip_generic_param_get_value (const osip_generic_param_t * generic_param);
 
 
 /**
@@ -461,7 +461,7 @@ extern "C" {
  * @param pos The index of the element to get.
  * @param dest A pointer on the header found.
  */
-  int osip_message_get_knownheaderlist (osip_list_t * header_list, int pos, void **dest);
+int osip_message_get_knownheaderlist (osip_list_t * header_list, int pos, void **dest);
 
 /** @} */
 
