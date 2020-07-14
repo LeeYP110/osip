@@ -1,6 +1,6 @@
 /*
   The oSIP library implements the Session Initiation Protocol (SIP -rfc3261-)
-  Copyright (C) 2001-2015 Aymeric MOIZARD amoizard@antisip.com
+  Copyright (C) 2001-2020 Aymeric MOIZARD amoizard@antisip.com
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -384,7 +384,7 @@ osip_authentication_info_to_str (const osip_authentication_info_t * ainfo, char 
   if (ainfo->auth_type != NULL)
     len = len + strlen (ainfo->auth_type) + 1;
   if (ainfo->nextnonce != NULL)
-    len = len + strlen (ainfo->nextnonce) + 11;
+    len = len + strlen (ainfo->nextnonce) + 12; /* fixed Jan 10,2020: missing one byte */
   if (ainfo->rspauth != NULL)
     len = len + strlen (ainfo->rspauth) + 10;
   if (ainfo->cnonce != NULL)
@@ -402,11 +402,12 @@ osip_authentication_info_to_str (const osip_authentication_info_t * ainfo, char 
   if (ainfo->realm != NULL)
     len = len + strlen (ainfo->realm) + 8;
   if (ainfo->opaque != NULL)
-    len = len + strlen (ainfo->opaque) + 8;
+    len = len + strlen (ainfo->opaque) + 9; /* fixed Jan 10,2020: missing one byte */
 
   if (len == 0)
     return OSIP_BADPARAMETER;
 
+  len++; /* fixed Jan 10,2020: missing one byte for the final \0 added by osip_str_append */
   tmp = (char *) osip_malloc (len);
   if (tmp == NULL)
     return OSIP_NOMEM;

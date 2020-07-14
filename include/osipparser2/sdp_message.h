@@ -1,6 +1,6 @@
 /*
   The oSIP library implements the Session Initiation Protocol (SIP -rfc3261-)
-  Copyright (C) 2001-2015 Aymeric MOIZARD amoizard@antisip.com
+  Copyright (C) 2001-2020 Aymeric MOIZARD amoizard@antisip.com
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -241,8 +241,6 @@ extern "C" {
     char *s_name;                               /**< Subject header */
     char *i_info;                               /**< Information header */
     char *u_uri;                                /**< Uri header */
-	char *y_ssrc;                               /**< GB 28181>*/
-	char *f_va;                                 /**< GB 28181>*/
     osip_list_t e_emails;              /**< list of mail address */
     osip_list_t p_phones;              /**< list of phone numbers * */
     sdp_connection_t *c_connection;

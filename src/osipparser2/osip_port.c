@@ -1,6 +1,6 @@
 /*
   The oSIP library implements the Session Initiation Protocol (SIP -rfc3261-)
-  Copyright (C) 2001-2015 Aymeric MOIZARD amoizard@antisip.com
+  Copyright (C) 2001-2020 Aymeric MOIZARD amoizard@antisip.com
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -854,7 +854,7 @@ osip_trace_initialize_syslog (osip_trace_level_t level, char *ident)
 void
 osip_trace_enable_until_level (osip_trace_level_t level)
 {
-  int i = 0;
+  osip_trace_level_t i = 0;
 
   while (i < END_TRACE_LEVEL) {
     if (i < level)
@@ -868,7 +868,7 @@ osip_trace_enable_until_level (osip_trace_level_t level)
 void
 osip_trace_initialize_func (osip_trace_level_t level, osip_trace_func_t * func)
 {
-  int i = 0;
+  osip_trace_level_t i = 0;
 
   trace_func = func;
 

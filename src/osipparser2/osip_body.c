@@ -1,6 +1,6 @@
 /*
   The oSIP library implements the Session Initiation Protocol (SIP -rfc3261-)
-  Copyright (C) 2001-2015 Aymeric MOIZARD amoizard@antisip.com
+  Copyright (C) 2001-2020 Aymeric MOIZARD amoizard@antisip.com
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -411,7 +411,7 @@ osip_body_to_str (const osip_body_t * body, char **dest, size_t * str_length)
   }
 
   if ((osip_list_size (body->headers) > 0) || (body->content_type != NULL)) {
-    if (length < tmp_body - ptr + 3) {
+    if (length < (size_t)(tmp_body - ptr + 3)) {
       size_t len;
 
       len = tmp_body - ptr;

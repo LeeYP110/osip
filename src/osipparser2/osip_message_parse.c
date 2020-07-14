@@ -1,6 +1,6 @@
 /*
   The oSIP library implements the Session Initiation Protocol (SIP -rfc3261-)
-  Copyright (C) 2001-2015 Aymeric MOIZARD amoizard@antisip.com
+  Copyright (C) 2001-2020 Aymeric MOIZARD amoizard@antisip.com
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -165,7 +165,7 @@ __osip_message_startline_parsereq (osip_message_t * dest, const char *buf, const
     osip_strncpy (dest->sip_version, p1 + 1, (hp - p1 - 1));
 
     if (0 != osip_strcasecmp (dest->sip_version, "SIP/2.0")) {
-      OSIP_TRACE (osip_trace (__FILE__, __LINE__, OSIP_ERROR, NULL, "Wrong version number\n"));
+      OSIP_TRACE (osip_trace (__FILE__, __LINE__, OSIP_WARNING, NULL, "Wrong version number\n"));
     }
 
     hp++;
@@ -189,6 +189,8 @@ __osip_message_startline_parseresp (osip_message_t * dest, const char *buf, cons
 
   statuscode = strchr (buf, ' ');       /* search for first SPACE */
   if (statuscode == NULL)
+    return OSIP_SYNTAXERROR;
+  if (statuscode - (*headers) < 7)      /* must be at least "SIP" "/"  1*DIGIT "." 1*DIGIT */
     return OSIP_SYNTAXERROR;
   dest->sip_version = (char *) osip_malloc (statuscode - (*headers) + 1);
   if (dest->sip_version == NULL)
@@ -252,28 +254,20 @@ __osip_message_startline_parse (osip_message_t * dest, const char *buf, const ch
 int
 __osip_find_next_occurence (const char *str, const char *buf, const char **index_of_str, const char *end_of_buf)
 {
-  int i;
+  size_t slen;
 
   *index_of_str = NULL;         /* AMD fix */
-  if ((NULL == str) || (NULL == buf))
+  if (str == NULL || buf == NULL)
     return OSIP_BADPARAMETER;
-  /* TODO? we may prefer strcasestr instead of strstr? // TODO? with large binary, it will break at 10000 loop with a syntax error */
-  for (i = 0; i < 10000; i++) {
-    *index_of_str = strstr (buf, str);
-    if (NULL == (*index_of_str)) {
-      /* if '\0' (when binary data is used) is located before the separator,
-         then we have to continue searching */
-      const char *ptr = buf + strlen (buf);
 
-      if (end_of_buf - ptr > 0) {
-        buf = ptr + 1;
-        continue;
-      }
-      return OSIP_SYNTAXERROR;
+  slen = strlen (str);
+  while (slen < (size_t) (end_of_buf - buf)) {
+    if (!memcmp (str, buf, slen)) {
+      *index_of_str = buf;
+      return OSIP_SUCCESS;
     }
-    return OSIP_SUCCESS;
+    ++buf;
   }
-  OSIP_TRACE (osip_trace (__FILE__, __LINE__, OSIP_BUG, NULL, "This was probably an infinite loop?\n"));
   return OSIP_SYNTAXERROR;
 }
 
@@ -317,6 +311,8 @@ osip_util_replace_all_lws (char *sip_message)
         tmp[0] = ' ';
         tmp++;
       }
+      if (tmp[0] == '\0')       /* fixed Janv 13 2020: Heap-buffer-overflow with a final LWS without nothing after */
+        return;
     }
   }
 }
@@ -498,6 +494,8 @@ osip_message_set_multiple_header (osip_message_t * sip, char *hname, char *hvalu
       /* we discard any validation we tried: no valid uri detected */
       inquotes = 0;
       inuri = 0;
+      // (keep next comment to avoid fall through warning)
+      // fall through
     case ',':
       if (!inquotes && !inuri) {
         char *avalue;

@@ -1,6 +1,6 @@
 /*
   The oSIP library implements the Session Initiation Protocol (SIP -rfc3261-)
-  Copyright (C) 2001-2015 Aymeric MOIZARD amoizard@antisip.com
+  Copyright (C) 2001-2020 Aymeric MOIZARD amoizard@antisip.com
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -595,6 +595,18 @@ _osip_message_to_str (osip_message_t * sip, char **dest, size_t * message_length
 
       if (len > MIME_MAX_BOUNDARY_LEN) {
         osip_free (*dest);
+        *dest = NULL;
+        return OSIP_SYNTAXERROR;
+      }
+
+      if (len == 1 && ct_param->gvalue[0] == '"') { /* fixed Jan 10,2020: avoid a negative length copy if boundary contains only one quote */
+        osip_free(*dest);
+        *dest = NULL;
+        return OSIP_SYNTAXERROR;
+      }
+
+      if (len == 2 && ct_param->gvalue[0] == '"' && ct_param->gvalue[1] == '"') { /* do not accept empty boundary */
+        osip_free(*dest);
         *dest = NULL;
         return OSIP_SYNTAXERROR;
       }

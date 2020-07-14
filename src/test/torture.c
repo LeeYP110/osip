@@ -1,6 +1,6 @@
 /*
   The oSIP library implements the Session Initiation Protocol (SIP -rfc3261-)
-  Copyright (C) 2001-2012 Aymeric MOIZARD amoizard@antisip.com
+  Copyright (C) 2001-2020 Aymeric MOIZARD amoizard@antisip.com
   
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -91,11 +91,16 @@ main (int argc, char **argv)
   ptr = msg;
   if (osip_strncasecmp (msg, "expected_error:", strlen ("expected_error:")) == 0) {
     ptr += strlen ("expected_error:");
+    len -= strlen ("expected_error:");
     expected_error = atoi (ptr);
-    while (*ptr != '\r' && *ptr != '\n')
+    while (*ptr != '\r' && *ptr != '\n') {
       ptr++;
-    while (*ptr == '\r' || *ptr == '\n')
+      len--;
+    }
+    while (*ptr == '\r' || *ptr == '\n') {
       ptr++;
+      len--;
+    }
   }
   success = test_message (ptr, len, verbose, clone, loop);
   if (verbose) {

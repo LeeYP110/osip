@@ -221,6 +221,8 @@
     <ClInclude Include="..\..\..\osip\include\osipparser2\headers\osip_www_authenticate.h" />
     <ClInclude Include="..\..\..\osip\src\osipparser2\parser.h" />
     <ClInclude Include="..\..\..\osip\include\osipparser2\sdp_message.h" />
+    <ClInclude Include="..\..\include\osipparser2\headers\osip_authentication_info.h" />
+    <ClInclude Include="..\..\include\osipparser2\headers\osip_proxy_authentication_info.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
